@@ -21,7 +21,7 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
-      - arm64
+        - arm64
       Environment:
         Variables:
           SLACK_BOT_TOKEN: 'aiueo'
