@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 60
+    Timeout: 600
     Tracing: Active
   Api:
     TracingEnabled: true
@@ -18,11 +18,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: chatgpt-bot/
-      Handler: app.lambdaHandler
+      Handler: app.handler
       Runtime: nodejs18.x
       Architectures:
         - arm64
+      FunctionUrlConfig:
+        AuthType: NONE
       Environment:
         Variables:
-          SLACK_BOT_TOKEN: 'aiueo'
-          OPENAI_API_KEY: 'aiueo'
+          SLACK_BOT_TOKEN: 'xoxb-'
+          OPENAI_API_KEY: 'sk-'
