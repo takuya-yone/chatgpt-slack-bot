@@ -30,9 +30,8 @@ export const handler = async (event, context) => {
     console.log(messageInput)
 
     const [posted_channel, ts] = await postMessage(channel, thread_ts, "考え中。。");
-    const openaiResponse = await createCompletion(messageInput,channel, thread_ts);
+    const openaiResponse = await createCompletion(messageInput, channel, thread_ts);
     await deleteMessage(posted_channel, ts)
-    console.log(channel,thread_ts,openaiResponse)
     await postMessage(channel, thread_ts, openaiResponse);
 
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
@@ -41,13 +40,17 @@ export const handler = async (event, context) => {
 async function createMessageInput(message, channel, thread_ts) {
     try {
         let messageList = [];
-        for (const element of message) {
+        // create list from reversed list
+        for (const element of message.reverse()) {
+            if (messageList.length > 15) break;
             if (element['user'] == 'U04VBNS9XT9') {
-                messageList.push({ "role": "assistant", "content": element["text"] })
+                messageList.unshift({ "role": "assistant", "content": element["text"] })
             } else if (element["text"].indexOf("U04VBNS9XT9") !== -1) {
-                messageList.push({ "role": "user", "content": element["text"].replace("<@U04VBNS9XT9> ", "") })
+                messageList.unshift({ "role": "user", "content": element["text"].replace("<@U04VBNS9XT9> ", "") })
             }
         }
+
+
         return messageList
 
     } catch (err) {

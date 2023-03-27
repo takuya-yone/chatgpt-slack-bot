@@ -9,9 +9,7 @@ Description: >
 Globals:
   Function:
     Timeout: 600
-    Tracing: Active
-  Api:
-    TracingEnabled: true
+    # Tracing: Active
 
 Resources:
   ChatGptFunction:
