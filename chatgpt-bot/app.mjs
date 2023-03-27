@@ -12,7 +12,6 @@ export const handler = async (event, context) => {
     }
 
     const body = JSON.parse(event.body);
-    const text = body.event.text.replace(/<@.*>/g, '');
 
     const thread_ts = body.event.thread_ts || body.event.ts;
 
@@ -23,15 +22,15 @@ export const handler = async (event, context) => {
         channel: channel,
         ts: thread_ts,
         // inclusive: true
-    })
+    });
 
-    const messageInput = await createMessageInput(replies['messages'])
+    const messageInput = await createMessageInput(replies['messages']);
 
-    console.log(messageInput)
+    console.log(messageInput);
 
     const [posted_channel, ts] = await postMessage(channel, thread_ts, "考え中。。");
     const openaiResponse = await createCompletion(messageInput, channel, thread_ts);
-    await deleteMessage(posted_channel, ts)
+    await deleteMessage(posted_channel, ts);
     await postMessage(channel, thread_ts, openaiResponse);
 
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
@@ -44,18 +43,18 @@ async function createMessageInput(message, channel, thread_ts) {
         for (const element of message.reverse()) {
             if (messageList.length > 15) break;
             if (element['user'] == 'U04VBNS9XT9') {
-                messageList.unshift({ "role": "assistant", "content": element["text"] })
+                messageList.unshift({ "role": "assistant", "content": element["text"] });
             } else if (element["text"].indexOf("U04VBNS9XT9") !== -1) {
-                messageList.unshift({ "role": "user", "content": element["text"].replace("<@U04VBNS9XT9> ", "") })
+                messageList.unshift({ "role": "user", "content": element["text"].replace("<@U04VBNS9XT9>", "") });
             }
         }
 
 
-        return messageList
+        return messageList;
 
     } catch (err) {
         postMessage(channel, thread_ts, "Input加工中にエラーが発生しました");
-        console.error(err)
+        console.error(err);
     }
 
 }
@@ -80,7 +79,7 @@ async function deleteMessage(channel, thread_ts) {
             ts: thread_ts,
         };
         const res = await slackClient.chat.delete(payload);
-        return [res['channel'], res['ts']]
+        return [res['channel'], res['ts']];
     } catch (err) {
         postMessage(channel, thread_ts, "メッセージ削除中にエラーが発生しました");
         console.error(err);
@@ -96,7 +95,7 @@ async function postMessage(channel, thread_ts, text) {
             as_user: true,
         };
         const res = await slackClient.chat.postMessage(payload);
-        return [res['channel'], res['ts']]
+        return [res['channel'], res['ts']];
     } catch (err) {
         console.error(err);
     }
