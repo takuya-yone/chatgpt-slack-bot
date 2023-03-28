@@ -28,7 +28,7 @@ export const handler = async (event, context) => {
 
     console.log(messageInput);
 
-    const [posted_channel, ts] = await postMessage(channel, thread_ts, "考え中。。");
+    const [posted_channel, ts] = await postMessage(channel, thread_ts, "[SYSTEM] 考え中。。");
     const openaiResponse = await createCompletion(messageInput, channel, thread_ts);
     await deleteMessage(posted_channel, ts);
     await postMessage(channel, thread_ts, openaiResponse);
@@ -53,7 +53,7 @@ async function createMessageInput(message, channel, thread_ts) {
         return messageList;
 
     } catch (err) {
-        postMessage(channel, thread_ts, "Input加工中にエラーが発生しました");
+        postMessage(channel, thread_ts, "[SYSTEM] Input加工中にエラーが発生しました");
         console.error(err);
     }
 
@@ -67,7 +67,7 @@ async function createCompletion(messageInput, channel, thread_ts) {
         });
         return response.data.choices[0].message?.content;
     } catch (err) {
-        postMessage(channel, thread_ts, "ChatGPT処理中ににエラーが発生しました");
+        postMessage(channel, thread_ts, "[SYSTEM] ChatGPT処理中ににエラーが発生しました");
         console.error(err);
     }
 }
@@ -81,7 +81,7 @@ async function deleteMessage(channel, thread_ts) {
         const res = await slackClient.chat.delete(payload);
         return [res['channel'], res['ts']];
     } catch (err) {
-        postMessage(channel, thread_ts, "メッセージ削除中にエラーが発生しました");
+        postMessage(channel, thread_ts, "[SYSTEM] メッセージ削除中にエラーが発生しました");
         console.error(err);
     }
 }
