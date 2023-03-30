@@ -5,34 +5,25 @@ const slackClient = new WebClient(process.env.SLACK_BOT_TOKEN);
 const openaiConfig = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
 const openaiClient = new OpenAIApi(openaiConfig);
 
-
 export const handler = async (event, context) => {
     if (event.headers['x-slack-retry-num']) {
         return { statusCode: 200, body: JSON.stringify({ message: 'No need to resend' }) };
     }
-
     const body = JSON.parse(event.body);
-
     const thread_ts = body.event.thread_ts || body.event.ts;
-
     const channel = body.event.channel;
-
     const replies = await slackClient.conversations.replies({
         token: process.env.SLACK_BOT_TOKEN,
         channel: channel,
         ts: thread_ts,
         // inclusive: true
     });
-
     const messageInput = await createMessageInput(replies['messages']);
-
     console.log(messageInput);
-
     const [posted_channel, ts] = await postMessage(channel, thread_ts, "[SYSTEM] 考え中。。");
     const openaiResponse = await createCompletion(messageInput, channel, thread_ts);
     await deleteMessage(posted_channel, ts);
     await postMessage(channel, thread_ts, openaiResponse);
-
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
 };
 
@@ -48,15 +39,12 @@ async function createMessageInput(message, channel, thread_ts) {
                 messageList.unshift({ "role": "user", "content": element["text"].replace("<@U04VBNS9XT9>", "") });
             }
         }
-
-
         return messageList;
 
     } catch (err) {
         postMessage(channel, thread_ts, "[SYSTEM] Input加工中にエラーが発生しました");
         console.error(err);
     }
-
 }
 
 async function createCompletion(messageInput, channel, thread_ts) {
